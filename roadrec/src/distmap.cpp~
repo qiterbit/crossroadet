@@ -12,55 +12,40 @@ ros::Subscriber  scan_sub;
 
 //width and height should be even and symmetry
 //precision must be integer divided by GRID**
-//3000 coordinate system
-#define   GRIDWIDTHL     -30
-#define   GRIDWIDTHR      30  
-#define   GRIDHEIGHT      40
-#define   PRECISION       0.5
-#define   INVPRECISION    2
+#define   GRIDWIDTHL     -10
+#define   GRIDWIDTHR      10  
+#define   GRIDHEIGHT      15
+#define   PRECISION       0.25
+#define   INVPRECISION    4
 #define   HALFPRECISION   PRECISION/2   
 #define   GRIDSIZE        GRIDHEIGHT*(GRIDWIDTHR-GRIDWIDTHL)*INVPRECISION*INVPRECISION
 
 cv::Mat meanfilter = cv::Mat::ones(3, 3, CV_32FC1) / 9;
 int my_callback(const in2_msgs::ScanInfoV2::ConstPtr &scaninfo_msg)
 {
-	//data receive 
-	cv::Mat src = cv::Mat(GRIDHEIGHT*INVPRECISION, GRIDWIDTHR*2*INVPRECISION, CV_8UC1, cv::Scalar::all(255));
-	for (int i = 360; i < 720; i++)
-	{
-		double bx, by;
-		bx = (double)(scaninfo_msg->ScanInfoX[i] - 1500) * 0.02;
-		by = (double)(scaninfo_msg->ScanInfoY[i] - 1000) * 0.02;
-		//if (bx >= GRIDWIDTHR || bx <= GRIDWIDTHL || by >= GRIDHEIGHT || by <= -1*GRIDHEIGHT)
-		//{
-		//	bx = 5.0 * cos(atan2(by+0.00001, bx+0.00001)); 
-		//	by = 5.0 * sin(atan2(by+0.00001, bx+0.00001));
-		//}
-		int indx = (int)((GRIDHEIGHT - by - PRECISION) * INVPRECISION);
-		int indy = (int)((bx + GRIDWIDTHR) * INVPRECISION);
-		src.at<uchar>(indx, indy) = 0;
-	}
-	cv::namedWindow("pointcloud2", 0);
-	cv::imshow("pointcloud2", src);
+	/* data receive */
 	
-	int num = 360;
+
 	printf("sendTime: %d\n", scaninfo_msg->sendtime);	
 	printf("\n");
 
-	//image process 
+	/* image process */
 	cv::Mat result_image(GRIDHEIGHT*INVPRECISION, GRIDWIDTHR*2*INVPRECISION, CV_8UC1, cv::Scalar::all(255));
 	for (int i = 0; i < num; i++)
 	{
-		//handle out points out of border 
+		/* handle out points out of border */	
 		float x, y;
-		x = double(scaninfo_msg->ScanInfoX[i+360] - 1500) * 0.02;
-		y = double(scaninfo_msg->ScanInfoY[i+360] - 1000) * 0.02;
-		/*if (x >= GRIDWIDTHR || x <= GRIDWIDTHL || y >= GRIDHEIGHT || y <= -1*GRIDHEIGHT)
+		if (scan->ranges[i] > 2 * PRECISION && scan->ranges[i] < scan->range_max)
 		{
-			x = 5.0 * cos(atan2(y+0.00001, x+0.00001)); 
-			y = 5.0 * sin(atan2(y+0.00001, x+0.00001));
-		}*/
-		//locate the search range of every line 
+			x = cos(i*PI/num) * scan->ranges[i];
+			y = sin(i*PI/num) * scan->ranges[i];
+		}
+		else
+		{
+			x = cos(i*PI/num) * scan->range_max;
+			y = sin(i*PI/num) * scan->range_max;
+		}
+		/* locate the search range of every line */
 		double block_startx, block_starty, block_endx, block_endy;
 		if (x < 0)
 		{
@@ -106,7 +91,7 @@ int my_callback(const in2_msgs::ScanInfoV2::ConstPtr &scaninfo_msg)
 			block_endx   = GRIDWIDTHR;
 			block_endy   = GRIDHEIGHT;
 		}
-		//set the obstacle point and unseen block to zero
+		/* set the obstacle point and unseen block to zero */ 
 		double angle = atan2(y, x) * 180 / PI;
 		double block_angle_begin, block_angle_end;
 		for (double bx = block_startx; bx < block_endx; bx += PRECISION)
@@ -144,7 +129,7 @@ int my_callback(const in2_msgs::ScanInfoV2::ConstPtr &scaninfo_msg)
 	cv::Point min_loc, max_loc;
 	double min, max;
 	cv::minMaxLoc(result_image, &min, &max, &min_loc, &max_loc);
-	cv::circle(result_image, max_loc, 5, cv::Scalar(0,100,255));
+	cv::circle(result_image, max_loc, 2, cv::Scalar(0,100,255));
 	cv::namedWindow("finalConv", 0);
 	cv::imshow("finalConv", result_image);
 	
