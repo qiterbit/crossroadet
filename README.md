@@ -4,12 +4,11 @@ Detect the position of crossroad using /in2_msgs/ScanInfoV2 formed data.
 
 ## Step by Step
 ### step1
-
 Install ROS first, creat and init your ros workspace
 
 ```cd ~```
 
-```mkdir -p catkin_ws/src
+```mkdir -p catkin_ws/src```
 
 ```catkin_init_workspace```
 
