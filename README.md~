@@ -15,5 +15,6 @@ step 2
 
 step 3
 
-	
+	git add .
+	git commit -m "add source code to Repo"
 	 
