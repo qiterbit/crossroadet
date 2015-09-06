@@ -162,8 +162,8 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+add_executable(distmap src/distmap.cpp)
+target_link_libraries(distmap ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
 add_executable(gridmap src/gridmap.cpp)
 target_link_libraries(gridmap ${catkin_LIBRARIES} ${OpenCV_LIBS})
-
-add_executable(testScan src/testScan.cpp)
-target_link_libraries(testScan ${catkin_LIBRARIES} ${OpenCV_LIBS})

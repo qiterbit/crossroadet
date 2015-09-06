@@ -26,17 +26,18 @@ int my_callback(const sensor_msgs::LaserScan::ConstPtr& scan_rec)
 	/* laser receive */
 	sensor_msgs::LaserScan::ConstPtr scan;
 	scan = scan_rec;
-	//printf("seq: %d\n", scan->header.seq);
-	//printf("stamp: %d\n", scan->header.stamp.sec);
-	//printf("frame_id: %s\n", scan->header.frame_id.c_str());
-	//printf("angle_range: [%f, %f]\n", scan->angle_min, scan->angle_max);
-	//printf("angle_increment: %f\n", scan->angle_increment);	
-	//printf("time_increment: %f\n", scan->time_increment);
-	//printf("scan_time: %f\n", scan->scan_time);
-	//printf("distance_range: [%f, %f]\n", scan->range_min, scan->range_max);
 	double per_angle = PI / 180.0 / scan->angle_increment;
 	int num = (scan->angle_max - scan->angle_min) / scan->angle_increment + 1;
-	//printf("number of points: %d\n", num);
+	printf("seq: %d\n", scan->header.seq);
+	printf("stamp: %d\n", scan->header.stamp.sec);
+	printf("frame_id: %s\n", scan->header.frame_id.c_str());
+	printf("angle_range: [%f, %f]deg\n", scan->angle_min / PI * 180, scan->angle_max / PI * 180);
+	printf("angle_increment: %f\n", scan->angle_increment / PI * 180);	
+	printf("time_increment: %f\n", scan->time_increment);
+	printf("scan_time: %f\n", scan->scan_time);
+	printf("distance_range: [%f, %f]m\n", scan->range_min, scan->range_max);
+	printf("number of points: %d\n", num);
+	printf("\n");
 
 	/* image process */
 	cv::Mat result_image(GRIDHEIGHT*INVPRECISION, GRIDWIDTHR*2*INVPRECISION, CV_8UC1, cv::Scalar::all(255));
@@ -148,19 +149,11 @@ int my_callback(const sensor_msgs::LaserScan::ConstPtr& scan_rec)
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "gridmap");
+    ros::init(argc, argv, "distmap");
     ros::NodeHandle n;
     scan_sub = n.subscribe<sensor_msgs::LaserScan>("/scan", 10, my_callback);
 
-	char key = 0;
-	while (ros::ok())
-	{
-		key = cv::waitKey(1);
-		printf("%c\n", key);
-		if (key == 'q')
-			break;
-		ros::spinOnce();
-	}
+	ros::spin();
 
 	return 0;
 }
