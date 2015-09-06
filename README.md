@@ -5,7 +5,7 @@ Detect the position of crossroad using /in2_msgs/ScanInfoV2 formed data.
 ## Step by Step
 ### step1
 
-Install ROS first, creat and init your ros workspace:
+Install ROS first, creat and init your ros workspace
 
 ```cd ~```
 
