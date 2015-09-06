@@ -10,13 +10,13 @@ Install ROS first, creat and init your ros workspace
 
 ```mkdir -p catkin_ws/src```
 
-```catkin_init_workspace```
+```catkin\_init\_workspace```
 
-```catkin_create_pkg crossroadet roscpp```
+```catkin\_create\_pkg crossroadet roscpp```
 
 ```cd ~/catkin_ws```
 
-```catkin_make```
+```catkin\_make```
 
 ```rosrun roadrec distmap```
 
